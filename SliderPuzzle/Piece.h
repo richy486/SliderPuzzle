@@ -8,8 +8,16 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSInteger, MoveRule) {
+    MOVERULE_HORAZONTAL,
+    MOVERULE_VERTICAL,
+    MOVERULE_NONE,
+    MOVERULE_COUNT
+};
+
 @interface Piece : UIView
-@property (nonatomic) BOOL moveable;
-- (id) initWithImage:(UIImage*) image;
+@property (nonatomic) MoveRule moveRule;
+@property (nonatomic, readonly) NSInteger originalIndex;
+- (id) initWithImage:(UIImage*) image andOriginalIndex:(NSInteger) originalIndex;
 
 @end

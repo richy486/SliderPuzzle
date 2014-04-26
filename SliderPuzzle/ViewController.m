@@ -31,9 +31,10 @@ NSInteger const PIECES_PER_SIDE = 4;
     
     CGFloat const pieceSize = fullImage.size.width / PIECES_PER_SIDE;
     NSMutableArray *pieces = [NSMutableArray arrayWithCapacity:PIECES_PER_SIDE*PIECES_PER_SIDE];
-    for (NSInteger iX = 0; iX < PIECES_PER_SIDE; ++iX) {
-        for (NSInteger iY = 0; iY < PIECES_PER_SIDE; ++iY) {
-            
+    NSInteger index = 0;
+    for (NSInteger iY = 0; iY < PIECES_PER_SIDE; ++iY) {
+        for (NSInteger iX = 0; iX < PIECES_PER_SIDE; ++iX) {
+        
             CGRect pieceRect = CGRectMake(iX * pieceSize * fullImage.scale
                                           , iY * pieceSize * fullImage.scale
                                           , pieceSize * fullImage.scale
@@ -43,12 +44,13 @@ NSInteger const PIECES_PER_SIDE = 4;
             UIImage *pieceImage = [UIImage imageWithCGImage:imageRef scale:fullImage.scale orientation:fullImage.imageOrientation];
             CGImageRelease(imageRef);
             
-            Piece *piece = [[Piece alloc] initWithImage:pieceImage];
+            Piece *piece = [[Piece alloc] initWithImage:pieceImage andOriginalIndex:index];
             
             piece.center = CGPointMake(CGRectGetMidX(self.view.frame) - ((PIECES_PER_SIDE/2) * pieceSize) + (pieceSize/2) + (iX * pieceSize)
                                        , CGRectGetMidY(self.view.frame) - ((PIECES_PER_SIDE/2) * pieceSize) + (pieceSize/2) + (iY * pieceSize));
-            
             [pieces addObject:piece];
+            
+            ++index;
         }
     }
     

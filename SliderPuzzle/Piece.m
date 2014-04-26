@@ -15,7 +15,7 @@
 
 @implementation Piece
 
-- (id) initWithImage:(UIImage*) image {
+- (id) initWithImage:(UIImage*) image andOriginalIndex:(NSInteger) originalIndex {
     
     
     CGRect frame;
@@ -33,11 +33,20 @@
             
             [self addSubview:self.mainImage];
             
-            self.moveable = YES;
+            self.moveRule = MOVERULE_NONE;
             
             UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGesture:)];
             panRecognizer.delegate = self;
             [self addGestureRecognizer:panRecognizer];
+            
+            _originalIndex = originalIndex;
+            
+            UILabel *debugNumberLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
+            debugNumberLabel.textAlignment = NSTextAlignmentCenter;
+            debugNumberLabel.backgroundColor = [UIColor whiteColor];
+            debugNumberLabel.numberOfLines = 1;
+            debugNumberLabel.text = [NSString stringWithFormat:@"%ld", (long)originalIndex];
+            [self addSubview:debugNumberLabel];
         }
     }
     return self;
@@ -47,7 +56,7 @@
 
 - (void) panGesture:(UIPanGestureRecognizer*) gesture {
     
-    if (self.moveable) {
+    if (self.moveRule != MOVERULE_NONE && self.moveRule != MOVERULE_COUNT) {
         switch( gesture.state ) {
             case UIGestureRecognizerStatePossible:
                 break;
@@ -58,8 +67,13 @@
             case UIGestureRecognizerStateChanged:
             {
                 CGPoint translation = [gesture translationInView:[gesture.view superview]];
-                CGPoint newPosition = CGPointMake(gesture.view.center.x + translation.x, gesture.view.center.y + translation.y);
-                gesture.view.center = newPosition;
+                CGPoint updatedPosition = gesture.view.center;
+                if (self.moveRule == MOVERULE_HORAZONTAL) {
+                    updatedPosition.x = updatedPosition.x + translation.x;
+                } else if (self.moveRule == MOVERULE_VERTICAL) {
+                    updatedPosition.y = updatedPosition.y + translation.y;
+                }
+                gesture.view.center = updatedPosition;
                 
                 [gesture setTranslation:CGPointZero inView:gesture.view];
             }

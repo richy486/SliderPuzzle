@@ -49,15 +49,18 @@
     NSInteger index = 0;
     for (Piece *piece in self.pieces) {
         
-        if (index != indexOfSpace && [piece respondsToSelector:@selector(setMoveable:)]) {
+        if (index != indexOfSpace && [piece respondsToSelector:@selector(setMoveRule:)]) {
             if ((index == indexOfSpace - _piecesPerSide) // above
-                || (index == indexOfSpace + _piecesPerSide) // below
-                || (index == indexOfSpace - 1 && (indexOfSpace%_piecesPerSide) != 0) // left
+                || (index == indexOfSpace + _piecesPerSide)){ // below
+                
+                [piece setMoveRule:MOVERULE_VERTICAL];
+                
+            } else if ((index == indexOfSpace - 1 && (indexOfSpace%_piecesPerSide) != 0) // left
                 || (index == indexOfSpace - 1 && (index%_piecesPerSide) != 0)) { // right
                 
-                [piece setMoveable:YES];
+                [piece setMoveRule:MOVERULE_HORAZONTAL];
             } else {
-                [piece setMoveable:NO];
+                [piece setMoveRule:MOVERULE_NONE];
             }
         }
         
