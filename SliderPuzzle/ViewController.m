@@ -8,9 +8,10 @@
 
 #import "ViewController.h"
 #import "Piece.h"
+#import "BoardController.h"
 
 @interface ViewController ()
-@property (nonatomic, strong) NSArray *pieces;
+@property (nonatomic, strong) BoardController *boardController;
 @end
 
 @implementation ViewController
@@ -50,13 +51,21 @@ NSInteger const PIECES_PER_SIDE = 4;
             [pieces addObject:piece];
         }
     }
-    self.pieces = [NSArray arrayWithArray:pieces];
     
+    // Remove the last piece
+    [pieces removeObjectAtIndex:[pieces count] -1];
+    
+
     NSInteger i = 0;
-    for (Piece *piece in self.pieces) {
+    for (Piece *piece in pieces) {
         [self.view addSubview:piece];
         ++i;
     }
+    
+    self.boardController = [[BoardController alloc] initWithPieces:pieces];
+    
+    NSLog(@"pieces per side: %ld", (long)[self.boardController piecesPerSide]);
+    
 
 }
 

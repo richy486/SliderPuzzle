@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface Piece : UIView
-
+@property (nonatomic) BOOL moveable;
 - (id) initWithImage:(UIImage*) image;
 
 @end
