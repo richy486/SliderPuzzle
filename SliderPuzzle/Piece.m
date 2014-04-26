@@ -10,7 +10,7 @@
 
 @interface Piece() <UIGestureRecognizerDelegate>
 @property (nonatomic, strong) UIImageView *mainImage;
-
+@property (nonatomic) CGFloat pieceSize;
 @end
 
 @implementation Piece
@@ -33,6 +33,8 @@
             
             [self addSubview:self.mainImage];
             
+            NSAssert(image.size.height == image.size.width, @"image width and height dont match");
+            self.pieceSize = image.size.height;
             self.moveRule = MOVERULE_NONE;
             
             UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGesture:)];
@@ -71,16 +73,16 @@
                 
                 switch (self.moveRule) {
                     case MOVERULE_ABOVE_SPACE:
-                        updatedPosition.y = MAX(self.gridPosition.y, updatedPosition.y + translation.y);
+                        updatedPosition.y = MIN(MAX(self.gridPosition.y, updatedPosition.y + translation.y), self.gridPosition.y + self.pieceSize);
                         break;
                     case MOVERULE_BELOW_SPACE:
-                        updatedPosition.y = MIN(self.gridPosition.y, updatedPosition.y + translation.y);
+                        updatedPosition.y = MAX(MIN(self.gridPosition.y, updatedPosition.y + translation.y), self.gridPosition.y - self.pieceSize);
                         break;
                     case MOVERULE_LEFTOF_SPACE:
-                        updatedPosition.x = MAX(self.gridPosition.x, updatedPosition.x + translation.x);
+                        updatedPosition.x = MIN(MAX(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x + self.pieceSize);
                         break;
                     case MOVERULE_RIGHTOF_SPACE:
-                        updatedPosition.x = MIN(self.gridPosition.x, updatedPosition.x + translation.x);
+                        updatedPosition.x = MAX(MIN(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x + self.pieceSize);;
                         break;
                     case MOVERULE_NONE:
                     case MOVERULE_COUNT:
