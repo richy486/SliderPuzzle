@@ -9,8 +9,10 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSInteger, MoveRule) {
-    MOVERULE_HORAZONTAL,
-    MOVERULE_VERTICAL,
+    MOVERULE_ABOVE_SPACE,
+    MOVERULE_BELOW_SPACE,
+    MOVERULE_LEFTOF_SPACE,
+    MOVERULE_RIGHTOF_SPACE,
     MOVERULE_NONE,
     MOVERULE_COUNT
 };
@@ -18,6 +20,7 @@ typedef NS_ENUM(NSInteger, MoveRule) {
 @interface Piece : UIView
 @property (nonatomic) MoveRule moveRule;
 @property (nonatomic, readonly) NSInteger originalIndex;
+@property (nonatomic) CGPoint gridPosition;
 - (id) initWithImage:(UIImage*) image andOriginalIndex:(NSInteger) originalIndex;
 
 @end

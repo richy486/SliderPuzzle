@@ -48,6 +48,7 @@ NSInteger const PIECES_PER_SIDE = 4;
             
             piece.center = CGPointMake(CGRectGetMidX(self.view.frame) - ((PIECES_PER_SIDE/2) * pieceSize) + (pieceSize/2) + (iX * pieceSize)
                                        , CGRectGetMidY(self.view.frame) - ((PIECES_PER_SIDE/2) * pieceSize) + (pieceSize/2) + (iY * pieceSize));
+            piece.gridPosition = piece.center;
             [pieces addObject:piece];
             
             ++index;

@@ -50,15 +50,14 @@
     for (Piece *piece in self.pieces) {
         
         if (index != indexOfSpace && [piece respondsToSelector:@selector(setMoveRule:)]) {
-            if ((index == indexOfSpace - _piecesPerSide) // above
-                || (index == indexOfSpace + _piecesPerSide)){ // below
-                
-                [piece setMoveRule:MOVERULE_VERTICAL];
-                
-            } else if ((index == indexOfSpace - 1 && (indexOfSpace%_piecesPerSide) != 0) // left
-                || (index == indexOfSpace - 1 && (index%_piecesPerSide) != 0)) { // right
-                
-                [piece setMoveRule:MOVERULE_HORAZONTAL];
+            if (index == indexOfSpace - _piecesPerSide) {
+                [piece setMoveRule:MOVERULE_ABOVE_SPACE];
+            } else if (index == indexOfSpace + _piecesPerSide){
+                [piece setMoveRule:MOVERULE_BELOW_SPACE];
+            } else if (index == indexOfSpace - 1 && (indexOfSpace%_piecesPerSide) != 0) {
+                [piece setMoveRule:MOVERULE_LEFTOF_SPACE];
+            } else if (index == indexOfSpace - 1 && (index%_piecesPerSide) != 0) {
+                [piece setMoveRule:MOVERULE_RIGHTOF_SPACE];
             } else {
                 [piece setMoveRule:MOVERULE_NONE];
             }

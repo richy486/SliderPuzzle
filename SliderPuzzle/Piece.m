@@ -68,10 +68,24 @@
             {
                 CGPoint translation = [gesture translationInView:[gesture.view superview]];
                 CGPoint updatedPosition = gesture.view.center;
-                if (self.moveRule == MOVERULE_HORAZONTAL) {
-                    updatedPosition.x = updatedPosition.x + translation.x;
-                } else if (self.moveRule == MOVERULE_VERTICAL) {
-                    updatedPosition.y = updatedPosition.y + translation.y;
+                
+                switch (self.moveRule) {
+                    case MOVERULE_ABOVE_SPACE:
+                        updatedPosition.y = MAX(self.gridPosition.y, updatedPosition.y + translation.y);
+                        break;
+                    case MOVERULE_BELOW_SPACE:
+                        updatedPosition.y = MIN(self.gridPosition.y, updatedPosition.y + translation.y);
+                        break;
+                    case MOVERULE_LEFTOF_SPACE:
+                        updatedPosition.x = MAX(self.gridPosition.x, updatedPosition.x + translation.x);
+                        break;
+                    case MOVERULE_RIGHTOF_SPACE:
+                        updatedPosition.x = MIN(self.gridPosition.x, updatedPosition.x + translation.x);
+                        break;
+                    case MOVERULE_NONE:
+                    case MOVERULE_COUNT:
+                    default:
+                        break;
                 }
                 gesture.view.center = updatedPosition;
                 
