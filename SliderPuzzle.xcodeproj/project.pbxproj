@@ -486,6 +486,7 @@
 				CAF63A0B190B80AB00F9F1A7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		CAF63A0C190B80AB00F9F1A7 /* Build configuration list for PBXNativeTarget "SliderPuzzleTests" */ = {
 			isa = XCConfigurationList;
@@ -494,6 +495,7 @@
 				CAF63A0E190B80AB00F9F1A7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
