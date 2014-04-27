@@ -43,6 +43,10 @@ static BOOL _isPieceAlreadyMoving = NO;
             panRecognizer.delegate = self;
             [self addGestureRecognizer:panRecognizer];
             
+            UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGesture:)];
+            tapRecognizer.delegate = self;
+            [self addGestureRecognizer:tapRecognizer];
+            
             _originalIndex = originalIndex;
             
             UILabel *debugNumberLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
@@ -76,7 +80,7 @@ static BOOL _isPieceAlreadyMoving = NO;
 - (void) panGesture:(UIPanGestureRecognizer*) gesture {
     
     if (self.moveRule != MOVERULE_NONE && self.moveRule != MOVERULE_COUNT) {
-        switch( gesture.state ) {
+        switch (gesture.state) {
             case UIGestureRecognizerStatePossible:
                 break;
             case UIGestureRecognizerStateBegan:
@@ -148,6 +152,28 @@ static BOOL _isPieceAlreadyMoving = NO;
                 break;
             case UIGestureRecognizerStateFailed:
                 [self moveToPosition:self.gridPosition andSetAsGridPosition:NO];
+                break;
+        }
+    }
+}
+
+- (void) tapGesture:(UIPanGestureRecognizer*) gesture {
+    if (self.moveRule != MOVERULE_NONE && self.moveRule != MOVERULE_COUNT) {
+        switch (gesture.state) {
+            case UIGestureRecognizerStatePossible:
+                break;
+            case UIGestureRecognizerStateBegan:
+                break;
+            case UIGestureRecognizerStateChanged:
+                break;
+            case UIGestureRecognizerStateEnded:
+                if (self.delegate && [self.delegate respondsToSelector:@selector(pieceDidMoveToEmptySpace:)]) {
+                    [self.delegate pieceDidMoveToEmptySpace:self];
+                }
+                break;
+            case UIGestureRecognizerStateCancelled:
+                break;
+            case UIGestureRecognizerStateFailed:
                 break;
         }
     }
