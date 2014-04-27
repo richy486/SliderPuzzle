@@ -79,78 +79,16 @@ NSInteger const SHUFFLE_MOVES = 500;
 
 - (void) shufflePieces {
     
-    for (NSInteger i = 0; i < SHUFFLE_MOVES; ++i) {
-        
-        // adjacent positions count
-        BOOL sides[4] = {NO, NO, NO, NO};
-        
-        const NSInteger leftIndex = 0;
-        const NSInteger rightIndex = 1;
-        const NSInteger aboveIndex = 2;
-        const NSInteger belowIndex = 3;
-        
-        NSInteger sidesAvailable = 0;
-        NSInteger indexOfSpace = [self.pieces indexOfObject:[NSNull null]];
-        if ((indexOfSpace - 1) / _piecesPerSide == indexOfSpace / _piecesPerSide && indexOfSpace - 1 >= 0) {
-            sides[leftIndex] = YES;
-            sidesAvailable++;
-        }
-        if ((indexOfSpace + 1) / _piecesPerSide == indexOfSpace / _piecesPerSide && indexOfSpace + 1 < _piecesPerSide * _piecesPerSide) {
-            sides[rightIndex] = YES;
-            sidesAvailable++;
-        }
-        if (indexOfSpace - _piecesPerSide >= 0) {
-            sides[aboveIndex] = YES;
-            sidesAvailable++;
-        }
-        if (indexOfSpace + _piecesPerSide < _piecesPerSide * _piecesPerSide) {
-            sides[belowIndex] = YES;
-            sidesAvailable++;
-        }
-        
-        NSAssert(sidesAvailable > 0, @"no available sides");
-        
-        // pick position from available
-        NSInteger randSide = arc4random()%sidesAvailable;
-        
-        NSInteger sidesSteppedThrough = -1;
-        NSInteger moveToSideIndex = -1;
-        for (NSInteger j = 0; j < 4; ++j) {
-            
-            if (sides[j]) {
-                ++sidesSteppedThrough;
-                if (sidesSteppedThrough == randSide) {
-                    moveToSideIndex = j;
-                }
-            }
-        }
-        
-        NSAssert(moveToSideIndex >= 0, @"could not find an available side");
-        
-        // move piece into space
-        NSInteger pieceIndex = -1;
-        switch (moveToSideIndex) {
-            case leftIndex:
-                pieceIndex = indexOfSpace - 1;
-                break;
-            case rightIndex:
-                pieceIndex = indexOfSpace + 1;
-                break;
-            case aboveIndex:
-                pieceIndex = indexOfSpace - _piecesPerSide;
-                break;
-            case belowIndex:
-                pieceIndex = indexOfSpace + _piecesPerSide;
-                break;
-            default:
-                break;
-        }
-        
-        Piece *pieceToMove = [self.pieces objectAtIndex:pieceIndex];
-        NSAssert([pieceToMove isKindOfClass:[Piece class]], @"tried to move non piece");
-        
-        [self.pieces exchangeObjectAtIndex:pieceIndex withObjectAtIndex:indexOfSpace];
+    NSMutableArray *shuffledPieces = [NSMutableArray arrayWithCapacity:_piecesPerSide*_piecesPerSide -1];
+    NSMutableArray *oldPieceOrder = [NSMutableArray arrayWithArray:self.pieces];
+    
+    while ([oldPieceOrder count] > 0) {
+        NSInteger pieceIndexToPick = arc4random()%[oldPieceOrder count];
+        Piece *piece = [oldPieceOrder objectAtIndex:pieceIndexToPick];
+        [shuffledPieces addObject:piece];
+        [oldPieceOrder removeObjectAtIndex:pieceIndexToPick];
     }
+    self.pieces = shuffledPieces;
     
     [self updateMovablePieces];
     
