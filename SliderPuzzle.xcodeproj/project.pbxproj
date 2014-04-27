@@ -408,6 +408,7 @@
 				GCC_PREFIX_HEADER = "SliderPuzzle/SliderPuzzle-Prefix.pch";
 				INFOPLIST_FILE = "SliderPuzzle/SliderPuzzle-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "2BFF229B-24D9-4AE4-B8A1-7B7E41B4CAB1";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -421,6 +422,7 @@
 				GCC_PREFIX_HEADER = "SliderPuzzle/SliderPuzzle-Prefix.pch";
 				INFOPLIST_FILE = "SliderPuzzle/SliderPuzzle-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "2BFF229B-24D9-4AE4-B8A1-7B7E41B4CAB1";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
