@@ -54,6 +54,20 @@
     return self;
 }
 
+#pragma movement
+
+- (void) moveToPosition:(CGPoint) position andSetAsGridPosition:(BOOL) setAsGridPosition {
+    [UIView animateWithDuration:0.1
+                     animations:^{
+                         self.center = position;
+                     }
+                     completion:^(BOOL finished) {
+                         if (setAsGridPosition) {
+                             self.gridPosition = position;
+                         }
+                     }];
+}
+
 #pragma mark Gestures
 
 - (void) panGesture:(UIPanGestureRecognizer*) gesture {
@@ -121,7 +135,7 @@
                         [self.delegate pieceDidMoveToEmptySpace:self];
                     }
                 } else {
-                    self.center = self.gridPosition;
+                    [self moveToPosition:self.gridPosition andSetAsGridPosition:NO];
                 }
             }
                 break;

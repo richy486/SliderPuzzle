@@ -30,5 +30,5 @@ typedef NS_ENUM(NSInteger, MoveRule) {
 @property (nonatomic, readonly) NSInteger originalIndex;
 @property (nonatomic) CGPoint gridPosition;
 - (id) initWithImage:(UIImage*) image andOriginalIndex:(NSInteger) originalIndex;
-
+- (void) moveToPosition:(CGPoint) position andSetAsGridPosition:(BOOL) setAsGridPosition;
 @end

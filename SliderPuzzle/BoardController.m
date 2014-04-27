@@ -47,10 +47,6 @@
             }
             ++index;
         }
-
-        
-        
-        
         [self updateMovablePieces];
     }
     return self;
@@ -64,9 +60,8 @@
     
     [self.pieces exchangeObjectAtIndex:indexOfPiece withObjectAtIndex:indexOfSpace];
     
-    if (piece && [piece respondsToSelector:@selector(setCenter:)] && [piece respondsToSelector:@selector(setGridPosition:)]) {
-        piece.center = positionOfSpace;
-        piece.gridPosition = positionOfSpace;
+    if (piece && [piece respondsToSelector:@selector(moveToPosition:andSetAsGridPosition:)]) {
+        [piece moveToPosition:positionOfSpace andSetAsGridPosition:YES];
     }
     
     [self updateMovablePieces];
