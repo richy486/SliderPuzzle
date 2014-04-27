@@ -15,6 +15,8 @@
 
 @implementation Piece
 
+static BOOL _isPieceAlreadyMoving = NO;
+
 - (id) initWithImage:(UIImage*) image andOriginalIndex:(NSInteger) originalIndex {
     
     
@@ -65,6 +67,7 @@
                          if (setAsGridPosition) {
                              self.gridPosition = position;
                          }
+                         _isPieceAlreadyMoving = NO;
                      }];
 }
 
@@ -77,6 +80,7 @@
             case UIGestureRecognizerStatePossible:
                 break;
             case UIGestureRecognizerStateBegan:
+                _isPieceAlreadyMoving = YES;
                 [self.superview bringSubviewToFront:self];
                 
                 break;
@@ -140,11 +144,23 @@
             }
                 break;
             case UIGestureRecognizerStateCancelled:
+                [self moveToPosition:self.gridPosition andSetAsGridPosition:NO];
                 break;
             case UIGestureRecognizerStateFailed:
+                [self moveToPosition:self.gridPosition andSetAsGridPosition:NO];
                 break;
         }
     }
+}
+
+#pragma mark gesture delegate
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if (_isPieceAlreadyMoving) {
+        return NO;
+    }
+    
+    return YES;
 }
 
 /*
