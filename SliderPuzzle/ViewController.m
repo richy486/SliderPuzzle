@@ -60,6 +60,10 @@ NSInteger const PIECES_PER_SIDE = 4;
 
 #pragma mark actions
 
+- (IBAction)touchUpIn_btnShuffle:(id)sender {
+    [self.boardController shufflePieces];
+}
+
 - (IBAction)touchUpIn_btnReset:(id)sender {
     [self.boardController resetPieces];
 }

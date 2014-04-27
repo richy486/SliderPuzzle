@@ -14,5 +14,6 @@
 @property (nonatomic, readonly) NSInteger piecesPerSide;
 - (id) initWithPieces:(NSArray*) pieces andViewRect:(CGRect) viewRect;
 - (void) movePieceTowardsSpace:(Piece*) piece;
+- (void) shufflePieces;
 - (void) resetPieces;
 @end
