@@ -21,8 +21,11 @@ typedef NS_ENUM(NSInteger, MoveRule) {
 
 @protocol PieceDelegate <NSObject>
 @optional
-- (void) pieceDidMoveToEmptySpace:(Piece*) piece;
-- (NSArray*) allPiecesThatShouldMoveWithSelectedPiece:(Piece*) piece;
+- (void) pieceDidStartMoving:(Piece*) piece;
+- (void) piece:(Piece*) piece didMoveBy:(CGPoint) translation;
+- (void) pieceDidFinishMovingToEmptySpace:(Piece*) piece;
+- (void) pieceDidCancelMovement:(Piece*) piece;
+//- (NSArray*) allPiecesThatShouldMoveWithSelectedPiece:(Piece*) piece;
 @end
 
 @interface Piece : UIView
@@ -31,5 +34,7 @@ typedef NS_ENUM(NSInteger, MoveRule) {
 @property (nonatomic, readonly) NSInteger originalIndex;
 @property (nonatomic) CGPoint gridPosition;
 - (id) initWithImage:(UIImage*) image andOriginalIndex:(NSInteger) originalIndex;
-- (void) moveToPosition:(CGPoint) position;
+- (void) animateBackToGridPosition;
+- (void) animateToPosition:(CGPoint) position;
+- (void) moveBy:(CGPoint) translation;
 @end

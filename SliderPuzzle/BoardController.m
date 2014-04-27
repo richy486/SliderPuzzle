@@ -13,6 +13,8 @@
 @property (nonatomic, strong) NSMutableArray *pieces;
 @property (nonatomic) CGRect viewRect;
 @property (nonatomic) CGFloat pieceSize;
+
+@property (nonatomic, strong) NSArray *piecesToMove;
 @end
 
 @implementation BoardController
@@ -58,14 +60,14 @@
 
     for (Piece *piece in allPieces) {
         
-        NSAssert([piece respondsToSelector:@selector(moveToPosition:)], @"all pieces in array should not be Piece objects");
+        NSAssert([piece respondsToSelector:@selector(animateToPosition:)], @"all pieces in array should not be Piece objects");
         
         NSInteger indexOfPiece = [self.pieces indexOfObject:piece];
         NSInteger indexOfSpace = [self.pieces indexOfObject:[NSNull null]];
         CGPoint positionOfSpace = [self positionForIndex:indexOfSpace];
         [self.pieces exchangeObjectAtIndex:indexOfPiece withObjectAtIndex:indexOfSpace];
         
-        [piece moveToPosition:positionOfSpace];
+        [piece animateToPosition:positionOfSpace];
     }
     
     [self updateMovablePieces];
@@ -106,14 +108,31 @@
 
 #pragma mark Piece Delegate
 
-- (void) pieceDidMoveToEmptySpace:(Piece *)piece {
+- (void) pieceDidStartMoving:(Piece *)piece {
+    
+    self.piecesToMove = [self allPiecesThatShouldMoveWithAndIncludingPiece:piece];
+}
+
+- (void) piece:(Piece *)piece didMoveBy:(CGPoint)translation {
+    
+    for (Piece *piece in self.piecesToMove) {
+        if (piece && [piece respondsToSelector:@selector(moveBy:)]) {
+            [piece moveBy:translation];
+        }
+    }
+}
+
+- (void) pieceDidFinishMovingToEmptySpace:(Piece *)piece {
     
     [self movePieceTowardsSpace:piece];
 }
 
-- (NSArray*) allPiecesThatShouldMoveWithSelectedPiece:(Piece*) piece {
-    
-    return [self allPiecesThatShouldMoveWithAndIncludingPiece:piece];
+- (void) pieceDidCancelMovement:(Piece*) piece {
+    for (Piece *piece in self.piecesToMove) {
+        if (piece && [piece respondsToSelector:@selector(animateBackToGridPosition)]) {
+            [piece animateBackToGridPosition];
+        }
+    }
 }
 
 #pragma mark private methods

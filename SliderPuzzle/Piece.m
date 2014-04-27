@@ -67,7 +67,7 @@ static BOOL _isPieceAlreadyMoving = NO;
 
 #pragma movement
 
-- (void) moveBackToGridPosition {
+- (void) animateBackToGridPosition {
     [UIView animateWithDuration:MOVE_ANIMATION_TIME
                      animations:^{
                          self.center = self.gridPosition;
@@ -77,7 +77,7 @@ static BOOL _isPieceAlreadyMoving = NO;
                      }];
 }
 
-- (void) moveToPosition:(CGPoint) position {
+- (void) animateToPosition:(CGPoint) position {
     
     [UIView animateWithDuration:MOVE_ANIMATION_TIME
                      animations:^{
@@ -88,6 +88,30 @@ static BOOL _isPieceAlreadyMoving = NO;
                          self.gridPosition = position;
                          _isPieceAlreadyMoving = NO;
                      }];
+}
+
+- (void) moveBy:(CGPoint) translation {
+    CGPoint updatedPosition = self.center;
+    
+    switch (self.moveRule) {
+        case MOVERULE_ABOVE_SPACE:
+            updatedPosition.y = MIN(MAX(self.gridPosition.y, updatedPosition.y + translation.y), self.gridPosition.y + self.pieceSize);
+            break;
+        case MOVERULE_BELOW_SPACE:
+            updatedPosition.y = MAX(MIN(self.gridPosition.y, updatedPosition.y + translation.y), self.gridPosition.y - self.pieceSize);
+            break;
+        case MOVERULE_LEFTOF_SPACE:
+            updatedPosition.x = MIN(MAX(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x + self.pieceSize);
+            break;
+        case MOVERULE_RIGHTOF_SPACE:
+            updatedPosition.x = MAX(MIN(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x - self.pieceSize);
+            break;
+        case MOVERULE_NONE:
+        case MOVERULE_COUNT:
+        default:
+            break;
+    }
+    self.center = updatedPosition;
 }
 
 #pragma move rules
@@ -133,33 +157,46 @@ static BOOL _isPieceAlreadyMoving = NO;
                 _isPieceAlreadyMoving = YES;
                 [self.superview bringSubviewToFront:self];
                 
+                if (self.delegate && [self.delegate respondsToSelector:@selector(pieceDidStartMoving:)]) {
+                    [self.delegate pieceDidStartMoving:self];
+                }
+                
                 break;
             case UIGestureRecognizerStateChanged:
             {
                 CGPoint translation = [gesture translationInView:[gesture.view superview]];
-                CGPoint updatedPosition = gesture.view.center;
+//                CGPoint updatedPosition = gesture.view.center;
+//                
+//                switch (self.moveRule) {
+//                    case MOVERULE_ABOVE_SPACE:
+//                        updatedPosition.y = MIN(MAX(self.gridPosition.y, updatedPosition.y + translation.y), self.gridPosition.y + self.pieceSize);
+//                        break;
+//                    case MOVERULE_BELOW_SPACE:
+//                        updatedPosition.y = MAX(MIN(self.gridPosition.y, updatedPosition.y + translation.y), self.gridPosition.y - self.pieceSize);
+//                        break;
+//                    case MOVERULE_LEFTOF_SPACE:
+//                        updatedPosition.x = MIN(MAX(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x + self.pieceSize);
+//                        break;
+//                    case MOVERULE_RIGHTOF_SPACE:
+//                        updatedPosition.x = MAX(MIN(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x - self.pieceSize);
+//                        break;
+//                    case MOVERULE_NONE:
+//                    case MOVERULE_COUNT:
+//                    default:
+//                        break;
+//                }
+//                gesture.view.center = updatedPosition;
                 
-                switch (self.moveRule) {
-                    case MOVERULE_ABOVE_SPACE:
-                        updatedPosition.y = MIN(MAX(self.gridPosition.y, updatedPosition.y + translation.y), self.gridPosition.y + self.pieceSize);
-                        break;
-                    case MOVERULE_BELOW_SPACE:
-                        updatedPosition.y = MAX(MIN(self.gridPosition.y, updatedPosition.y + translation.y), self.gridPosition.y - self.pieceSize);
-                        break;
-                    case MOVERULE_LEFTOF_SPACE:
-                        updatedPosition.x = MIN(MAX(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x + self.pieceSize);
-                        break;
-                    case MOVERULE_RIGHTOF_SPACE:
-                        updatedPosition.x = MAX(MIN(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x - self.pieceSize);
-                        break;
-                    case MOVERULE_NONE:
-                    case MOVERULE_COUNT:
-                    default:
-                        break;
-                }
-                gesture.view.center = updatedPosition;
+                
+//                if ([gesture.view respondsToSelector:@selector(moveBy:)]) {
+//                    [(id)(gesture.view) moveBy:translation];
+//                }
                 
                 [gesture setTranslation:CGPointZero inView:gesture.view];
+                
+                if (self.delegate && [self.delegate respondsToSelector:@selector(piece:didMoveBy:)]) {
+                    [self.delegate piece:self didMoveBy:translation];
+                }
             }
                 break;
             case UIGestureRecognizerStateEnded:
@@ -185,19 +222,25 @@ static BOOL _isPieceAlreadyMoving = NO;
                 }
                 
                 if (hasTakenEmptyPosition) {
-                    if (self.delegate && [self.delegate respondsToSelector:@selector(pieceDidMoveToEmptySpace:)]) {
-                        [self.delegate pieceDidMoveToEmptySpace:self];
+                    if (self.delegate && [self.delegate respondsToSelector:@selector(pieceDidFinishMovingToEmptySpace:)]) {
+                        [self.delegate pieceDidFinishMovingToEmptySpace:self];
                     }
                 } else {
-                    [self moveBackToGridPosition];
+                    if (self.delegate && [self.delegate respondsToSelector:@selector(pieceDidCancelMovement:)]) {
+                        [self.delegate pieceDidCancelMovement:self];
+                    }
                 }
             }
                 break;
             case UIGestureRecognizerStateCancelled:
-                [self moveBackToGridPosition];
+                if (self.delegate && [self.delegate respondsToSelector:@selector(pieceDidCancelMovement:)]) {
+                    [self.delegate pieceDidCancelMovement:self];
+                }
                 break;
             case UIGestureRecognizerStateFailed:
-                [self moveBackToGridPosition];
+                if (self.delegate && [self.delegate respondsToSelector:@selector(pieceDidCancelMovement:)]) {
+                    [self.delegate pieceDidCancelMovement:self];
+                }
                 break;
         }
     }
@@ -213,8 +256,8 @@ static BOOL _isPieceAlreadyMoving = NO;
             case UIGestureRecognizerStateChanged:
                 break;
             case UIGestureRecognizerStateEnded:
-                if (self.delegate && [self.delegate respondsToSelector:@selector(pieceDidMoveToEmptySpace:)]) {
-                    [self.delegate pieceDidMoveToEmptySpace:self];
+                if (self.delegate && [self.delegate respondsToSelector:@selector(pieceDidFinishMovingToEmptySpace:)]) {
+                    [self.delegate pieceDidFinishMovingToEmptySpace:self];
                 }
                 break;
             case UIGestureRecognizerStateCancelled:
