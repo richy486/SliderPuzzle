@@ -11,7 +11,10 @@
 @interface Piece() <UIGestureRecognizerDelegate>
 @property (nonatomic, strong) UIImageView *mainImage;
 @property (nonatomic) CGFloat pieceSize;
-@property (nonatomic, weak) UILabel *debugNumberLabel;
+
+#ifdef SHOW_DEBUG_LABELS
+    @property (nonatomic, weak) UILabel *debugNumberLabel;
+#endif
 @end
 
 @implementation Piece
@@ -53,6 +56,7 @@ static BOOL _isPieceAlreadyMoving = NO;
             
             _originalIndex = originalIndex;
             
+#ifdef SHOW_DEBUG_LABELS
             UILabel *debugNumberLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 0, self.pieceSize - 10, 30)];
             self.debugNumberLabel = debugNumberLabel;
             self.debugNumberLabel.textAlignment = NSTextAlignmentCenter;
@@ -60,6 +64,7 @@ static BOOL _isPieceAlreadyMoving = NO;
             self.debugNumberLabel.numberOfLines = 1;
             self.debugNumberLabel.text = [NSString stringWithFormat:@"%ld", (long)originalIndex];
             [self addSubview:self.debugNumberLabel];
+#endif
         }
     }
     return self;
@@ -116,6 +121,7 @@ static BOOL _isPieceAlreadyMoving = NO;
 
 #pragma move rules
 
+#ifdef SHOW_DEBUG_LABELS
 - (void) setMoveRule:(MoveRule)moveRule {
     _moveRule = moveRule;
     
@@ -144,6 +150,7 @@ static BOOL _isPieceAlreadyMoving = NO;
     }
     self.debugNumberLabel.text = [NSString stringWithFormat:@"%ld %@", (long)_originalIndex, moveRuleString];
 }
+#endif
 
 #pragma mark Gestures
 
