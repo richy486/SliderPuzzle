@@ -11,11 +11,15 @@
 @interface Piece() <UIGestureRecognizerDelegate>
 @property (nonatomic, strong) UIImageView *mainImage;
 @property (nonatomic) CGFloat pieceSize;
+@property (nonatomic, weak) UILabel *debugNumberLabel;
 @end
 
 @implementation Piece
 
+CGFloat MOVE_ANIMATION_TIME = 0.2;
+
 static BOOL _isPieceAlreadyMoving = NO;
+
 
 - (id) initWithImage:(UIImage*) image andOriginalIndex:(NSInteger) originalIndex {
     
@@ -49,12 +53,13 @@ static BOOL _isPieceAlreadyMoving = NO;
             
             _originalIndex = originalIndex;
             
-            UILabel *debugNumberLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
-            debugNumberLabel.textAlignment = NSTextAlignmentCenter;
-            debugNumberLabel.backgroundColor = [UIColor whiteColor];
-            debugNumberLabel.numberOfLines = 1;
-            debugNumberLabel.text = [NSString stringWithFormat:@"%ld", (long)originalIndex];
-            [self addSubview:debugNumberLabel];
+            UILabel *debugNumberLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 0, self.pieceSize - 10, 30)];
+            self.debugNumberLabel = debugNumberLabel;
+            self.debugNumberLabel.textAlignment = NSTextAlignmentCenter;
+            self.debugNumberLabel.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.75];
+            self.debugNumberLabel.numberOfLines = 1;
+            self.debugNumberLabel.text = [NSString stringWithFormat:@"%ld", (long)originalIndex];
+            [self addSubview:self.debugNumberLabel];
         }
     }
     return self;
@@ -62,17 +67,58 @@ static BOOL _isPieceAlreadyMoving = NO;
 
 #pragma movement
 
-- (void) moveToPosition:(CGPoint) position andSetAsGridPosition:(BOOL) setAsGridPosition {
-    [UIView animateWithDuration:0.1
+- (void) moveBackToGridPosition {
+    [UIView animateWithDuration:MOVE_ANIMATION_TIME
                      animations:^{
+                         self.center = self.gridPosition;
+                     }
+                     completion:^(BOOL finished) {
+                         _isPieceAlreadyMoving = NO;
+                     }];
+}
+
+- (void) moveToPosition:(CGPoint) position {
+    
+    [UIView animateWithDuration:MOVE_ANIMATION_TIME
+                     animations:^{
+                         
                          self.center = position;
                      }
                      completion:^(BOOL finished) {
-                         if (setAsGridPosition) {
-                             self.gridPosition = position;
-                         }
+                         self.gridPosition = position;
                          _isPieceAlreadyMoving = NO;
                      }];
+}
+
+#pragma move rules
+
+- (void) setMoveRule:(MoveRule)moveRule {
+    _moveRule = moveRule;
+    
+    NSString *moveRuleString = nil;
+    switch (self.moveRule) {
+        case MOVERULE_ABOVE_SPACE:
+            moveRuleString = @"A";
+            break;
+        case MOVERULE_BELOW_SPACE:
+            moveRuleString = @"B";
+            break;
+        case MOVERULE_LEFTOF_SPACE:
+            moveRuleString = @"L";
+            break;
+        case MOVERULE_RIGHTOF_SPACE:
+            moveRuleString = @"R";
+            break;
+        case MOVERULE_NONE:
+            moveRuleString = @"";
+            break;
+        case MOVERULE_COUNT:
+            moveRuleString = @"!";
+            break;
+        default:
+            break;
+    }
+    self.debugNumberLabel.text = [NSString stringWithFormat:@"%ld %@", (long)_originalIndex, moveRuleString];
 }
 
 #pragma mark Gestures
@@ -104,7 +150,7 @@ static BOOL _isPieceAlreadyMoving = NO;
                         updatedPosition.x = MIN(MAX(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x + self.pieceSize);
                         break;
                     case MOVERULE_RIGHTOF_SPACE:
-                        updatedPosition.x = MAX(MIN(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x - self.pieceSize);;
+                        updatedPosition.x = MAX(MIN(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x - self.pieceSize);
                         break;
                     case MOVERULE_NONE:
                     case MOVERULE_COUNT:
@@ -143,15 +189,15 @@ static BOOL _isPieceAlreadyMoving = NO;
                         [self.delegate pieceDidMoveToEmptySpace:self];
                     }
                 } else {
-                    [self moveToPosition:self.gridPosition andSetAsGridPosition:NO];
+                    [self moveBackToGridPosition];
                 }
             }
                 break;
             case UIGestureRecognizerStateCancelled:
-                [self moveToPosition:self.gridPosition andSetAsGridPosition:NO];
+                [self moveBackToGridPosition];
                 break;
             case UIGestureRecognizerStateFailed:
-                [self moveToPosition:self.gridPosition andSetAsGridPosition:NO];
+                [self moveBackToGridPosition];
                 break;
         }
     }

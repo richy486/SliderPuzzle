@@ -52,16 +52,33 @@
     return self;
 }
 
-- (void) movePieceIntoSpace:(Piece*) piece {
+- (void) movePieceTowardsSpace:(Piece*) piece {
     
-    NSInteger indexOfPiece = [self.pieces indexOfObject:piece];
-    NSInteger indexOfSpace = [self.pieces indexOfObject:[NSNull null]];
-    CGPoint positionOfSpace = [self positionForIndex:indexOfSpace];
     
-    [self.pieces exchangeObjectAtIndex:indexOfPiece withObjectAtIndex:indexOfSpace];
     
-    if (piece && [piece respondsToSelector:@selector(moveToPosition:andSetAsGridPosition:)]) {
-        [piece moveToPosition:positionOfSpace andSetAsGridPosition:YES];
+    
+    
+    NSArray *extraPieces = [self allPiecesThatShouldMoveWithSelectedPiece:piece];
+    
+    // TODO: this should be a chached array for each movement
+    NSMutableArray *allPieces = [NSMutableArray arrayWithCapacity:[extraPieces count]];
+    NSEnumerator *enumerator = [extraPieces reverseObjectEnumerator];
+    for (id element in enumerator) {
+        [allPieces addObject:element];
+    }
+    [allPieces addObject:piece];
+
+
+    for (Piece *piece in allPieces) {
+        
+        NSAssert([piece respondsToSelector:@selector(moveToPosition:)], @"all pieces in array should not be Piece objects");
+        
+        NSInteger indexOfPiece = [self.pieces indexOfObject:piece];
+        NSInteger indexOfSpace = [self.pieces indexOfObject:[NSNull null]];
+        CGPoint positionOfSpace = [self positionForIndex:indexOfSpace];
+        [self.pieces exchangeObjectAtIndex:indexOfPiece withObjectAtIndex:indexOfSpace];
+        
+        [piece moveToPosition:positionOfSpace];
     }
     
     [self updateMovablePieces];
@@ -75,14 +92,22 @@
     for (Piece *piece in self.pieces) {
         
         if (index != indexOfSpace && [piece respondsToSelector:@selector(setMoveRule:)]) {
-            if (index == indexOfSpace - _piecesPerSide) {
-                [piece setMoveRule:MOVERULE_ABOVE_SPACE];
-            } else if (index == indexOfSpace + _piecesPerSide){
-                [piece setMoveRule:MOVERULE_BELOW_SPACE];
-            } else if (index == indexOfSpace - 1 && (indexOfSpace%_piecesPerSide) != 0) {
-                [piece setMoveRule:MOVERULE_LEFTOF_SPACE];
-            } else if (index == indexOfSpace + 1 && (index%_piecesPerSide) != 0) {
-                [piece setMoveRule:MOVERULE_RIGHTOF_SPACE];
+            if (index / _piecesPerSide == indexOfSpace / _piecesPerSide) {
+                // is in the same row
+                
+                if (index < indexOfSpace) {
+                    [piece setMoveRule:MOVERULE_LEFTOF_SPACE];
+                } else {
+                    [piece setMoveRule:MOVERULE_RIGHTOF_SPACE];
+                }
+            } else if (index % _piecesPerSide == indexOfSpace % _piecesPerSide) {
+                // is same column
+                
+                if (index < indexOfSpace) {
+                    [piece setMoveRule:MOVERULE_ABOVE_SPACE];
+                } else {
+                    [piece setMoveRule:MOVERULE_BELOW_SPACE];
+                }
             } else {
                 [piece setMoveRule:MOVERULE_NONE];
             }
@@ -96,7 +121,73 @@
 
 - (void) pieceDidMoveToEmptySpace:(Piece *)piece {
     
-    [self movePieceIntoSpace:piece];
+    [self movePieceTowardsSpace:piece];
+}
+
+- (NSArray*) allPiecesThatShouldMoveWithSelectedPiece:(Piece*) piece {
+    
+    NSInteger indexOfPiece = [self.pieces indexOfObject:piece];
+    NSInteger indexOfSpace = [self.pieces indexOfObject:[NSNull null]];
+    
+    NSMutableArray *extraPieces = [NSMutableArray arrayWithCapacity:_piecesPerSide - 1];
+    switch (piece.moveRule){
+        case MOVERULE_ABOVE_SPACE:
+        {
+            NSInteger index = indexOfPiece + _piecesPerSide;
+            while (index != indexOfSpace) {
+                id piece = [self.pieces objectAtIndex:index];
+                if (piece && [piece isKindOfClass:[Piece class]]) {
+                    [extraPieces addObject:piece];
+                }
+                
+                index += _piecesPerSide;
+            }
+        }
+            break;
+        case MOVERULE_BELOW_SPACE:
+        {
+            NSInteger index = indexOfPiece - _piecesPerSide;
+            while (index != indexOfSpace) {
+                id piece = [self.pieces objectAtIndex:index];
+                if (piece && [piece isKindOfClass:[Piece class]]) {
+                    [extraPieces addObject:piece];
+                }
+                
+                index -= _piecesPerSide;
+            }
+        }
+            break;
+        case MOVERULE_LEFTOF_SPACE:
+        {
+            NSInteger index = indexOfPiece + 1;
+            while (index != indexOfSpace) {
+                id piece = [self.pieces objectAtIndex:index];
+                if (piece && [piece isKindOfClass:[Piece class]]) {
+                    [extraPieces addObject:piece];
+                }
+                ++index;
+            }
+        }
+            break;
+        case MOVERULE_RIGHTOF_SPACE:
+        {
+            NSInteger index = indexOfPiece - 1;
+            while (index != indexOfSpace) {
+                id piece = [self.pieces objectAtIndex:index];
+                if (piece && [piece isKindOfClass:[Piece class]]) {
+                    [extraPieces addObject:piece];
+                }
+                --index;
+            }
+        }
+            break;
+        case MOVERULE_NONE:
+        case MOVERULE_COUNT:
+        default:
+            break;
+    }
+    
+    return extraPieces;
 }
 
 #pragma mark private methods

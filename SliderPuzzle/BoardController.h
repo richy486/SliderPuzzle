@@ -13,5 +13,5 @@
 @interface BoardController : NSObject
 @property (nonatomic, readonly) NSInteger piecesPerSide;
 - (id) initWithPieces:(NSArray*) pieces andViewRect:(CGRect) viewRect;
-- (void) movePieceIntoSpace:(Piece*) piece;
+- (void) movePieceTowardsSpace:(Piece*) piece;
 @end
