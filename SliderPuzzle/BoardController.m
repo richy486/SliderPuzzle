@@ -75,37 +75,33 @@
     [self updateMovablePieces];
 }
 
-- (void) updateMovablePieces {
+- (void) resetPieces {
     
-    NSInteger indexOfSpace = [self.pieces indexOfObject:[NSNull null]];
-    
-    NSInteger index = 0;
     for (Piece *piece in self.pieces) {
-        
-        if (index != indexOfSpace && [piece respondsToSelector:@selector(setMoveRule:)]) {
-            if (index / _piecesPerSide == indexOfSpace / _piecesPerSide) {
-                // is in the same row
-                
-                if (index < indexOfSpace) {
-                    [piece setMoveRule:MOVERULE_LEFTOF_SPACE];
-                } else {
-                    [piece setMoveRule:MOVERULE_RIGHTOF_SPACE];
-                }
-            } else if (index % _piecesPerSide == indexOfSpace % _piecesPerSide) {
-                // is same column
-                
-                if (index < indexOfSpace) {
-                    [piece setMoveRule:MOVERULE_ABOVE_SPACE];
-                } else {
-                    [piece setMoveRule:MOVERULE_BELOW_SPACE];
-                }
-            } else {
-                [piece setMoveRule:MOVERULE_NONE];
-            }
+        if ([piece respondsToSelector:@selector(animateToPosition:)]) {
+            
+            CGPoint position = [self positionForIndex:piece.originalIndex];
+            [piece animateToPosition:position];
         }
-        
-        ++index;
     }
+    
+    NSArray *sortedPieces = [self.pieces sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+        
+        if (![a respondsToSelector:@selector(originalIndex)]) {
+            return NSOrderedDescending;
+        } else if (![b respondsToSelector:@selector(originalIndex)]) {
+            return NSOrderedAscending;
+        } else if ([a originalIndex] < [b originalIndex]) {
+            return NSOrderedAscending;
+        } else if ([a originalIndex] > [b originalIndex]) {
+            return NSOrderedDescending;
+        } else {
+            return NSOrderedSame;
+        }
+    }];
+    self.pieces = [NSMutableArray arrayWithArray:sortedPieces];
+    
+    [self updateMovablePieces];
 }
 
 #pragma mark Piece Delegate
@@ -139,6 +135,39 @@
 }
 
 #pragma mark private methods
+
+- (void) updateMovablePieces {
+    
+    NSInteger indexOfSpace = [self.pieces indexOfObject:[NSNull null]];
+    
+    NSInteger index = 0;
+    for (Piece *piece in self.pieces) {
+        
+        if (index != indexOfSpace && [piece respondsToSelector:@selector(setMoveRule:)]) {
+            if (index / _piecesPerSide == indexOfSpace / _piecesPerSide) {
+                // is in the same row
+                
+                if (index < indexOfSpace) {
+                    [piece setMoveRule:MOVERULE_LEFTOF_SPACE];
+                } else {
+                    [piece setMoveRule:MOVERULE_RIGHTOF_SPACE];
+                }
+            } else if (index % _piecesPerSide == indexOfSpace % _piecesPerSide) {
+                // is same column
+                
+                if (index < indexOfSpace) {
+                    [piece setMoveRule:MOVERULE_ABOVE_SPACE];
+                } else {
+                    [piece setMoveRule:MOVERULE_BELOW_SPACE];
+                }
+            } else {
+                [piece setMoveRule:MOVERULE_NONE];
+            }
+        }
+        
+        ++index;
+    }
+}
 
 - (NSArray*) allPiecesThatShouldMoveWithAndIncludingPiece:(Piece *)piece {
     

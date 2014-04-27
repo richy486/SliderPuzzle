@@ -58,6 +58,12 @@ NSInteger const PIECES_PER_SIDE = 4;
     self.boardController = [[BoardController alloc] initWithPieces:pieces andViewRect:self.view.frame];
 }
 
+#pragma mark actions
+
+- (IBAction)touchUpIn_btnReset:(id)sender {
+    [self.boardController resetPieces];
+}
+
 #pragma mark memory man
 
 - (void)didReceiveMemoryWarning
