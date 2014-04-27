@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+@class Piece;
+
 typedef NS_ENUM(NSInteger, MoveRule) {
     MOVERULE_ABOVE_SPACE,
     MOVERULE_BELOW_SPACE,
@@ -17,7 +19,13 @@ typedef NS_ENUM(NSInteger, MoveRule) {
     MOVERULE_COUNT
 };
 
+@protocol PieceDelegate <NSObject>
+@optional
+- (void) pieceDidMoveToEmptySpace:(Piece*) piece;
+@end
+
 @interface Piece : UIView
+@property (assign) id<PieceDelegate> delegate;
 @property (nonatomic) MoveRule moveRule;
 @property (nonatomic, readonly) NSInteger originalIndex;
 @property (nonatomic) CGPoint gridPosition;

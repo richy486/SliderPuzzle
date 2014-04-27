@@ -46,9 +46,9 @@ NSInteger const PIECES_PER_SIDE = 4;
             
             Piece *piece = [[Piece alloc] initWithImage:pieceImage andOriginalIndex:index];
             
-            piece.center = CGPointMake(CGRectGetMidX(self.view.frame) - ((PIECES_PER_SIDE/2) * pieceSize) + (pieceSize/2) + (iX * pieceSize)
-                                       , CGRectGetMidY(self.view.frame) - ((PIECES_PER_SIDE/2) * pieceSize) + (pieceSize/2) + (iY * pieceSize));
-            piece.gridPosition = piece.center;
+//            piece.center = CGPointMake(CGRectGetMidX(self.view.frame) - ((PIECES_PER_SIDE/2) * pieceSize) + (pieceSize/2) + (iX * pieceSize)
+//                                       , CGRectGetMidY(self.view.frame) - ((PIECES_PER_SIDE/2) * pieceSize) + (pieceSize/2) + (iY * pieceSize));
+//            piece.gridPosition = piece.center;
             [pieces addObject:piece];
             
             ++index;
@@ -65,7 +65,7 @@ NSInteger const PIECES_PER_SIDE = 4;
         ++i;
     }
     
-    self.boardController = [[BoardController alloc] initWithPieces:pieces];
+    self.boardController = [[BoardController alloc] initWithPieces:pieces andViewRect:self.view.frame];
     
     NSLog(@"pieces per side: %ld", (long)[self.boardController piecesPerSide]);
     

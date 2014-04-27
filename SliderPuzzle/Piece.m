@@ -82,7 +82,7 @@
                         updatedPosition.x = MIN(MAX(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x + self.pieceSize);
                         break;
                     case MOVERULE_RIGHTOF_SPACE:
-                        updatedPosition.x = MAX(MIN(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x + self.pieceSize);;
+                        updatedPosition.x = MAX(MIN(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x - self.pieceSize);;
                         break;
                     case MOVERULE_NONE:
                     case MOVERULE_COUNT:
@@ -95,6 +95,35 @@
             }
                 break;
             case UIGestureRecognizerStateEnded:
+            {
+                BOOL hasTakenEmptyPosition = NO;
+                switch (self.moveRule) {
+                    case MOVERULE_ABOVE_SPACE:
+                        hasTakenEmptyPosition = gesture.view.center.y - self.gridPosition.y > self.pieceSize/2;
+                        break;
+                    case MOVERULE_BELOW_SPACE:
+                        hasTakenEmptyPosition = self.gridPosition.y - gesture.view.center.y > self.pieceSize/2;
+                        break;
+                    case MOVERULE_LEFTOF_SPACE:
+                        hasTakenEmptyPosition = gesture.view.center.x - self.gridPosition.x > self.pieceSize/2;
+                        break;
+                    case MOVERULE_RIGHTOF_SPACE:
+                        hasTakenEmptyPosition = self.gridPosition.x - gesture.view.center.x > self.pieceSize/2;
+                        break;
+                    case MOVERULE_NONE:
+                    case MOVERULE_COUNT:
+                    default:
+                        break;
+                }
+                
+                if (hasTakenEmptyPosition) {
+                    if (self.delegate && [self.delegate respondsToSelector:@selector(pieceDidMoveToEmptySpace:)]) {
+                        [self.delegate pieceDidMoveToEmptySpace:self];
+                    }
+                } else {
+                    self.center = self.gridPosition;
+                }
+            }
                 break;
             case UIGestureRecognizerStateCancelled:
                 break;
