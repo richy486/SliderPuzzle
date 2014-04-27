@@ -25,7 +25,6 @@ typedef NS_ENUM(NSInteger, MoveRule) {
 - (void) piece:(Piece*) piece didMoveBy:(CGPoint) translation;
 - (void) pieceDidFinishMovingToEmptySpace:(Piece*) piece;
 - (void) pieceDidCancelMovement:(Piece*) piece;
-//- (NSArray*) allPiecesThatShouldMoveWithSelectedPiece:(Piece*) piece;
 @end
 
 @interface Piece : UIView

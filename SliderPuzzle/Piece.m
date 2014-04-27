@@ -172,32 +172,6 @@ static BOOL _isPieceAlreadyMoving = NO;
             case UIGestureRecognizerStateChanged:
             {
                 CGPoint translation = [gesture translationInView:[gesture.view superview]];
-//                CGPoint updatedPosition = gesture.view.center;
-//                
-//                switch (self.moveRule) {
-//                    case MOVERULE_ABOVE_SPACE:
-//                        updatedPosition.y = MIN(MAX(self.gridPosition.y, updatedPosition.y + translation.y), self.gridPosition.y + self.pieceSize);
-//                        break;
-//                    case MOVERULE_BELOW_SPACE:
-//                        updatedPosition.y = MAX(MIN(self.gridPosition.y, updatedPosition.y + translation.y), self.gridPosition.y - self.pieceSize);
-//                        break;
-//                    case MOVERULE_LEFTOF_SPACE:
-//                        updatedPosition.x = MIN(MAX(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x + self.pieceSize);
-//                        break;
-//                    case MOVERULE_RIGHTOF_SPACE:
-//                        updatedPosition.x = MAX(MIN(self.gridPosition.x, updatedPosition.x + translation.x), self.gridPosition.x - self.pieceSize);
-//                        break;
-//                    case MOVERULE_NONE:
-//                    case MOVERULE_COUNT:
-//                    default:
-//                        break;
-//                }
-//                gesture.view.center = updatedPosition;
-                
-                
-//                if ([gesture.view respondsToSelector:@selector(moveBy:)]) {
-//                    [(id)(gesture.view) moveBy:translation];
-//                }
                 
                 [gesture setTranslation:CGPointZero inView:gesture.view];
                 
