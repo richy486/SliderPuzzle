@@ -56,9 +56,11 @@
 
 - (void) movePieceTowardsSpace:(Piece*) piece {
 
-    NSArray *allPieces = [self allPiecesThatShouldMoveWithAndIncludingPiece:piece];
+    if (!self.piecesToMove || [self.piecesToMove count] == 0) {
+        self.piecesToMove = [self allPiecesThatShouldMoveWithAndIncludingPiece:piece];
+    }
 
-    for (Piece *piece in allPieces) {
+    for (Piece *piece in self.piecesToMove) {
         
         NSAssert([piece respondsToSelector:@selector(animateToPosition:)], @"all pieces in array should not be Piece objects");
         
@@ -125,6 +127,7 @@
 - (void) pieceDidFinishMovingToEmptySpace:(Piece *)piece {
     
     [self movePieceTowardsSpace:piece];
+    self.piecesToMove = nil;
 }
 
 - (void) pieceDidCancelMovement:(Piece*) piece {
